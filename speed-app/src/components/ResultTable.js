@@ -7,6 +7,7 @@ const ResultTable = ({ data }) => {
     <Table>
       <TableHead>
         <TableRow>
+        <TableCell>Rating</TableCell>
           <TableCell>Title</TableCell>
           <TableCell>Authors</TableCell>
           <TableCell>Journal</TableCell>
