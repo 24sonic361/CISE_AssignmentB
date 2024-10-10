@@ -4,9 +4,10 @@ import withReactContent from 'sweetalert2-react-content';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
-  const navigate = useNavigate();  
+  const navigate = useNavigate();  // Initialize useNavigate for redirection
   const MySwal = withReactContent(Swal);
   const [inputs, setInputs] = useState({});
+  const [confirmPassword, setConfirmPassword] = useState('');  // Separate state for confirm password
 
   const handleChange = (event) => {
     const name = event.target.name;
@@ -14,16 +15,32 @@ function Register() {
     setInputs(values => ({ ...values, [name]: value }));
   }
 
+  const handleConfirmPasswordChange = (event) => {
+    setConfirmPassword(event.target.value);
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // Check if password and confirm password match
+    if (inputs.password !== confirmPassword) {
+      MySwal.fire({
+        text: 'Passwords do not match!',
+        icon: 'error'
+      });
+      return;
+    }
 
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
+      "fname": inputs.fname,
+      "lname": inputs.lname,
       "username": inputs.username,
+      "password": inputs.password,
       "email": inputs.email,
-      "password": inputs.password
+      "avatar": inputs.avatar || "https://www.melivecode.com/users/cat.png" // Default avatar if not provided
     });
 
     const requestOptions = {
@@ -34,7 +51,7 @@ function Register() {
     };
 
     // Fetch API for registration
-    fetch("https://www.melivecode.com/api/register", requestOptions)
+    fetch("https://www.melivecode.com/api/users/create", requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
@@ -68,6 +85,24 @@ function Register() {
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.form}>
         <h2 style={styles.title}>Register</h2>
+        <label style={styles.label}>First Name:</label>
+        <input
+          style={styles.input}
+          type="text"
+          name="fname"
+          value={inputs.fname || ""}
+          onChange={handleChange}
+          required
+        />
+        <label style={styles.label}>Last Name:</label>
+        <input
+          style={styles.input}
+          type="text"
+          name="lname"
+          value={inputs.lname || ""}
+          onChange={handleChange}
+          required
+        />
         <label style={styles.label}>Username:</label>
         <input
           style={styles.input}
@@ -75,6 +110,7 @@ function Register() {
           name="username"
           value={inputs.username || ""}
           onChange={handleChange}
+          required
         />
         <label style={styles.label}>Email:</label>
         <input
@@ -83,6 +119,7 @@ function Register() {
           name="email"
           value={inputs.email || ""}
           onChange={handleChange}
+          required
         />
         <label style={styles.label}>Password:</label>
         <input
@@ -90,6 +127,23 @@ function Register() {
           type="password"
           name="password"
           value={inputs.password || ""}
+          onChange={handleChange}
+          required
+        />
+        <label style={styles.label}>Confirm Password:</label>
+        <input
+          style={styles.input}
+          type="password"
+          value={confirmPassword}
+          onChange={handleConfirmPasswordChange}
+          required
+        />
+        <label style={styles.label}>Avatar (URL):</label>
+        <input
+          style={styles.input}
+          type="text"
+          name="avatar"
+          value={inputs.avatar || ""}
           onChange={handleChange}
         />
         <button type="submit" style={styles.button}>Register</button>
